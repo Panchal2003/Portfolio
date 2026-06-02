@@ -6,9 +6,5 @@
       "destination": "/index.html"
     }
   ],
-  "build": {
-    "env": {
-      "VITE_BUILD_TOOL": "rollup"
-    }
-  }
+  "buildCommand": "npm run vercel-build"
 }
