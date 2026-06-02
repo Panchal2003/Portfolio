@@ -11,6 +11,11 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes('node_modules')) return undefined
 
+          // Keep React in the main bundle to avoid "useState of undefined" errors
+          if (id.includes('react') || id.includes('scheduler')) {
+            return undefined
+          }
+
           if (id.includes('@react-three')) {
             return 'r3f-vendor'
           }
@@ -44,13 +49,6 @@ export default defineConfig({
             id.includes('dompurify')
           ) {
             return 'capture-vendor'
-          }
-
-          if (
-            id.includes('react') ||
-            id.includes('scheduler')
-          ) {
-            return 'react-vendor'
           }
 
           return 'vendor'
