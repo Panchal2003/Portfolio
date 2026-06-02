@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
+import API from '../api/index';
 
 const container = {
   hidden: { opacity: 0 },
@@ -42,15 +43,21 @@ export default function ContactApp({ profile = {} }) {
     setForm(prev => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       alert('Please fill in all required fields (Name, Email, Message).');
       return;
     }
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-    setForm({ name: '', email: '', subject: '', message: '' });
+    try {
+      await API.post('/contacts', form);
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 3000);
+      setForm({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      alert('Failed to send message. Please try again.');
+      console.error(error);
+    }
   };
 
   const contactCards = [

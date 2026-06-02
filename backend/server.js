@@ -60,6 +60,7 @@ app.use('/api/projects', require('./routes/projects'));
 app.use('/api/experience', require('./routes/experience'));
 app.use('/api/education', require('./routes/education'));
 app.use('/api/achievements', require('./routes/achievements'));
+app.use('/api/contacts', require('./routes/contacts'));
 
 // Local server
 if (process.env.NODE_ENV !== 'production') {

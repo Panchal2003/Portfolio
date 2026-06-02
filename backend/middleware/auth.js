@@ -10,9 +10,6 @@ const auth = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const JWT_SECRET = process.env.JWT_SECRET;
     
-    // Debug: log token first few chars
-    console.log('Token received:', token ? token.substring(0, 20) + '...' : 'empty');
-    
     if (!JWT_SECRET) {
       return res.status(500).json({ message: 'Server configuration error: JWT_SECRET not set' });
     }

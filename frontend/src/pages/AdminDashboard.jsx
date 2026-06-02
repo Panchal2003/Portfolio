@@ -726,15 +726,77 @@ const adminApps = [
   { id: 'analytics', title: 'Analytics', icon: '📊', desc: 'View statistics' },
 ];
 
+// ─── Contacts List (Admin) ───
+function ContactsList() {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await API.get('/contacts');
+      setContacts(Array.isArray(data) ? data : []);
+    } catch {
+      setContacts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this contact message?')) return;
+    try {
+      await API.delete(`/contacts/${id}`);
+      setContacts(prev => prev.filter(c => c._id !== id));
+      toast.success('Deleted!');
+    } catch {
+      toast.error('Delete failed');
+    }
+  };
+
+  return (
+    <div style={{ padding: 4 }}>
+      <h3 style={{ fontFamily: "'Orbitron', sans-serif", color: '#00f0ff', fontSize: '1rem', marginBottom: 16 }}>Contact Messages</h3>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40, color: '#8888aa' }}>Loading messages...</div>
+      ) : contacts.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 40, color: '#666', fontFamily: "'Share Tech Mono', monospace", fontSize: '0.85rem' }}>No messages yet.</div>
+      ) : (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {contacts.map(c => (
+            <motion.div key={c._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ background: 'rgba(12,12,34,0.6)', border: '1px solid rgba(42,42,74,0.3)', borderRadius: 12, padding: '16px 18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.85rem', color: '#e0e0ff', fontWeight: 700 }}>{c.name}</span>
+                    <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.7rem', color: '#00f0ff' }}>{c.email}</span>
+                    {c.subject && <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: '0.75rem', color: '#bf00ff', background: 'rgba(191,0,255,0.1)', padding: '2px 8px', borderRadius: 4 }}>{c.subject}</span>}
+                  </div>
+                  <p style={{ color: '#aaa', fontFamily: "'Rajdhani', sans-serif", fontSize: '0.9rem', margin: '6px 0 0', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{c.message}</p>
+                  <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.65rem', color: '#555', marginTop: 8 }}>{new Date(c.createdAt).toLocaleString()}</div>
+                </div>
+                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => handleDelete(c._id)} style={{ background: 'none', border: '1px solid #ff336644', color: '#ff3366', padding: '6px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 11, fontFamily: "'Rajdhani', sans-serif" }}>Delete</motion.button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Admin Desktop ───
 function AdminDesktop() {
   const { windows, openWin, focusWin } = useAdminWin();
   const navigate = useNavigate();
-  const [time, setTime] = useState(new Date());
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
+    const h = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
   }, []);
 
   const handleLogout = () => {
@@ -797,18 +859,7 @@ function AdminDesktop() {
           ]}
         />
       );
-      case 'contact': return (
-        <div style={{ textAlign: 'center', padding: 40 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📬</div>
-          <h3 style={{ fontFamily: "'Orbitron', sans-serif", color: '#00f0ff', marginBottom: 8 }}>Contact Messages</h3>
-          <p style={{ color: '#8888aa' }}>Contact form submissions will appear here. Connect this to your backend to receive messages.</p>
-          <div style={{ marginTop: 20, padding: 20, background: 'rgba(0,240,255,0.05)', borderRadius: 12, border: '1px dashed rgba(0,240,255,0.2)' }}>
-            <p style={{ color: '#666', fontFamily: "'Share Tech Mono', monospace", fontSize: '0.85rem' }}>
-              No messages yet. Messages from the contact form will be displayed here.
-            </p>
-          </div>
-        </div>
-      );
+      case 'contact': return <ContactsList />;
       case 'settings': return (
         <div>
           <h3 style={{ fontFamily: "'Orbitron', sans-serif", color: '#00f0ff', marginBottom: 16, fontSize: '1rem' }}>Site Settings</h3>
@@ -913,15 +964,20 @@ function AdminDesktop() {
 
       {/* ─── Desktop Icons ─── */}
       <div style={{
-        position: 'absolute', top: 64, left: 16, right: 16,
+        position: 'absolute', top: 'clamp(48px, 6vh, 64px)', left: 'clamp(8px, 1.5vw, 16px)', right: 'clamp(8px, 1.5vw, 16px)',
         display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-        gap: 16, zIndex: 2,
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: 'clamp(8px, 1.2vw, 14px)', zIndex: 2,
         width: 'min(600px, calc(100vw - 32px))', margin: '0 auto',
       }}>
         {adminApps.map((app, i) => {
           const glowColors = ['#00f0ff', '#bf00ff', '#ff0080', '#00ff88', '#ffaa00', '#00aaff'];
           const glow = glowColors[i % glowColors.length];
+          const iconSize = isMobile ? 'clamp(28px, 8vw, 42px)' : 'clamp(36px, 5vw, 52px)';
+          const titleSize = isMobile ? 'clamp(10px, 2.5vw, 12px)' : 'clamp(11px, 1.5vw, 13px)';
+          const descSize = isMobile ? 'clamp(8px, 2vw, 9px)' : 'clamp(8px, 1.2vw, 9px)';
+          const iconPadding = isMobile ? '14px 10px' : '22px 14px';
+          const minH = isMobile ? 'clamp(100px, 22vh, 140px)' : 'clamp(120px, 18vh, 160px)';
           return (
             <motion.div
               key={app.id}
@@ -930,15 +986,15 @@ function AdminDesktop() {
               transition={{ delay: i * 0.1, type: 'spring', stiffness: 200, damping: 20 }}
               onClick={() => openWin(app.id, app.title, app.icon)}
               whileHover={{
-                scale: 1.08,
-                y: -5,
-                boxShadow: `0 0 30px ${glow}40, 0 10px 40px rgba(0,0,0,0.3)`,
-                borderColor: `${glow}60`
+                scale: 1.05,
+                y: -4,
+                boxShadow: `0 0 25px ${glow}35, 0 8px 30px rgba(0,0,0,0.25)`,
+                borderColor: `${glow}50`
               }}
               whileTap={{ scale: 0.95 }}
               style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                minHeight: 140, padding: '22px 14px', borderRadius: 18,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(4px, 1vh, 8px)',
+                minHeight: minH, padding: iconPadding, borderRadius: 'clamp(12px, 2vw, 18px)',
                 background: 'linear-gradient(180deg, rgba(12,12,34,0.8) 0%, rgba(8,8,24,0.9) 100%)',
                 border: '1px solid rgba(42,42,74,0.3)',
                 backdropFilter: 'blur(12px)', cursor: 'pointer',
@@ -960,12 +1016,12 @@ function AdminDesktop() {
               {/* Icon with glow */}
               <motion.span
                 style={{
-                  fontSize: 42,
+                  fontSize: iconSize,
                   position: 'relative', zIndex: 1,
-                  filter: `drop-shadow(0 0 8px ${glow}60)`,
+                  filter: `drop-shadow(0 0 6px ${glow}50)`,
                 }}
                 animate={{
-                  y: [0, -3, 0],
+                  y: [0, -2, 0],
                 }}
                 transition={{
                   duration: 2 + (i * 0.3),
@@ -979,26 +1035,28 @@ function AdminDesktop() {
               
               {/* Title */}
               <span style={{
-                fontSize: 12,
+                fontSize: titleSize,
                 fontFamily: "'Orbitron', sans-serif",
                 fontWeight: 700,
                 color: '#e0e0ff',
                 textAlign: 'center',
-                letterSpacing: 1,
+                letterSpacing: 'clamp(0.3px, 0.5vw, 1px)',
                 position: 'relative', zIndex: 1,
-                textShadow: `0 0 10px ${glow}40`,
+                textShadow: `0 0 8px ${glow}35`,
+                lineHeight: 1.2,
               }}>
                 {app.title}
               </span>
               
               {/* Description */}
               <span style={{
-                fontSize: 9,
+                fontSize: descSize,
                 fontFamily: "'Share Tech Mono', monospace",
                 color: '#666688',
                 textAlign: 'center',
                 position: 'relative', zIndex: 1,
-                letterSpacing: 0.5,
+                letterSpacing: 'clamp(0.2px, 0.3vw, 0.5px)',
+                lineHeight: 1.3,
               }}>
                 {app.desc}
               </span>
@@ -1011,7 +1069,7 @@ function AdminDesktop() {
                   left: '50%',
                   transform: 'translateX(-50%)',
                   width: '40%',
-                  height: 2,
+                  height: 'clamp(1px, 0.3vw, 2px)',
                   background: `linear-gradient(90deg, transparent, ${glow}, transparent)`,
                   borderRadius: 1,
                 }}
@@ -1073,17 +1131,6 @@ function AdminDesktop() {
         </div>
 
         <div style={{ width: 1, height: 24, background: '#1a1a3a', margin: '0 4px' }} />
-
-        {/* Clock */}
-        <div style={{
-          fontFamily: "'Share Tech Mono', monospace", fontSize: 11,
-          color: '#555', textAlign: 'right', lineHeight: 1.4,
-        }}>
-          <div style={{ color: '#00f0ff', fontWeight: 600 }}>
-            {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-          </div>
-          <div>{time.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-        </div>
       </div>
     </div>
   );
