@@ -73,10 +73,10 @@ function AdminWindow({ id, title, icon, zIndex, minimized, maximized, pos, child
 
   return (
     <motion.div
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.9, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+      initial={{ scale: 0.9, opacity: 0, y: 20 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.9, opacity: 0, y: 20 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       onClick={() => focusWin(id)}
       style={{
         position: isFullScreen ? 'fixed' : 'absolute',
@@ -87,10 +87,10 @@ function AdminWindow({ id, title, icon, zIndex, minimized, maximized, pos, child
         zIndex,
         background: 'rgba(10, 10, 30, 0.98)',
         backdropFilter: 'blur(25px)',
-        border: isFullScreen ? 'none' : '1px solid #2a2a4a',
-        borderRadius: isFullScreen ? 0 : 12,
+        border: isFullScreen ? 'none' : '1px solid rgba(0,240,255,0.15)',
+        borderRadius: isFullScreen ? 0 : 16,
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        boxShadow: isFullScreen ? 'none' : '0 0 50px rgba(0,240,255,0.1), 0 25px 80px rgba(0,0,0,0.6)',
+        boxShadow: isFullScreen ? 'none' : '0 0 60px rgba(0,240,255,0.15), 0 25px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)',
       }}
     >
       {/* Title Bar */}
@@ -103,30 +103,65 @@ function AdminWindow({ id, title, icon, zIndex, minimized, maximized, pos, child
         }}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 16px', minHeight: 44,
-          background: 'linear-gradient(90deg, rgba(0,240,255,0.06), rgba(191,0,255,0.06))',
-          borderBottom: '1px solid rgba(42,42,74,0.6)',
+          padding: '12px 18px', minHeight: 48,
+          background: 'linear-gradient(90deg, rgba(0,240,255,0.08) 0%, rgba(191,0,255,0.08) 100%)',
+          borderBottom: '1px solid rgba(0,240,255,0.1)',
           cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 18 }}>{icon}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <motion.span
+            style={{ fontSize: 20 }}
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+          >
+            {icon}
+          </motion.span>
           <span style={{
-            fontFamily: "'Orbitron', sans-serif", fontSize: 12, color: '#00f0ff',
-            fontWeight: 700, letterSpacing: 1,
+            fontFamily: "'Orbitron', sans-serif", fontSize: 13, color: '#00f0ff',
+            fontWeight: 700, letterSpacing: 1.5,
+            textShadow: '0 0 10px rgba(0,240,255,0.3)',
           }}>{title}</span>
         </div>
-        <div className="wctrl" style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => minimizeWin(id)} style={winBtn('#ffaa00')} title="Minimize" />
-          <button onClick={() => maximizeWin(id)} style={winBtn('#00ff88')} title={maximized ? 'Restore' : 'Maximize'} />
-          <button onClick={() => closeWin(id)} style={winBtn('#ff3366')} title="Close" />
+        <div className="wctrl" style={{ display: 'flex', gap: 8 }}>
+          <motion.button
+            onClick={() => minimizeWin(id)}
+            style={winBtn('#ffaa00')}
+            title="Minimize"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          />
+          <motion.button
+            onClick={() => maximizeWin(id)}
+            style={winBtn('#00ff88')}
+            title={maximized ? 'Restore' : 'Maximize'}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          />
+          <motion.button
+            onClick={() => closeWin(id)}
+            style={winBtn('#ff3366')}
+            title="Close"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          />
         </div>
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? '16px 14px 24px' : '24px 22px' }}>
+      <motion.div
+        style={{
+          flex: 1,
+          overflow: 'auto',
+          padding: isMobile ? '16px 14px 24px' : '24px 22px',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(0,240,255,0.02), transparent 60%)',
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
         {children}
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -680,12 +715,15 @@ const actionBtn = (c) => ({
 
 // ─── Admin Apps Config ───
 const adminApps = [
-  { id: 'profile', title: 'Profile', icon: '👤', desc: 'Edit your personal info' },
+  { id: 'profile', title: 'Profile', icon: '👤', desc: 'Edit personal info' },
   { id: 'skills', title: 'Skills', icon: '⚡', desc: 'Manage tech stack' },
   { id: 'projects', title: 'Projects', icon: '🚀', desc: 'Add/edit projects' },
   { id: 'experience', title: 'Experience', icon: '💼', desc: 'Work history' },
   { id: 'education', title: 'Education', icon: '🎓', desc: 'Degrees & certs' },
   { id: 'achievements', title: 'Achievements', icon: '🏆', desc: 'Awards & milestones' },
+  { id: 'contact', title: 'Contacts', icon: '📬', desc: 'View messages' },
+  { id: 'settings', title: 'Settings', icon: '⚙️', desc: 'Site configuration' },
+  { id: 'analytics', title: 'Analytics', icon: '📊', desc: 'View statistics' },
 ];
 
 // ─── Admin Desktop ───
@@ -759,6 +797,67 @@ function AdminDesktop() {
           ]}
         />
       );
+      case 'contact': return (
+        <div style={{ textAlign: 'center', padding: 40 }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📬</div>
+          <h3 style={{ fontFamily: "'Orbitron', sans-serif", color: '#00f0ff', marginBottom: 8 }}>Contact Messages</h3>
+          <p style={{ color: '#8888aa' }}>Contact form submissions will appear here. Connect this to your backend to receive messages.</p>
+          <div style={{ marginTop: 20, padding: 20, background: 'rgba(0,240,255,0.05)', borderRadius: 12, border: '1px dashed rgba(0,240,255,0.2)' }}>
+            <p style={{ color: '#666', fontFamily: "'Share Tech Mono', monospace", fontSize: '0.85rem' }}>
+              No messages yet. Messages from the contact form will be displayed here.
+            </p>
+          </div>
+        </div>
+      );
+      case 'settings': return (
+        <div>
+          <h3 style={{ fontFamily: "'Orbitron', sans-serif", color: '#00f0ff', marginBottom: 16, fontSize: '1rem' }}>Site Settings</h3>
+          <div style={{ display: 'grid', gap: 14 }}>
+            <Field label="Site Title" name="siteTitle" value="Sachin Kumar Panchal" placeholder="Your name" />
+            <Field label="Site Description" name="siteDesc" value="Software Engineer | Full Stack MERN Developer" textarea placeholder="Brief description" />
+            <Field label="Meta Keywords" name="keywords" value="portfolio, developer, react, node.js" placeholder="Comma separated keywords" />
+            <SaveBtn onClick={() => toast.success('Settings saved!')} label="Save Settings" icon={<HiSave size={14} />} />
+          </div>
+        </div>
+      );
+      case 'analytics': return (
+        <div>
+          <h3 style={{ fontFamily: "'Orbitron', sans-serif", color: '#00f0ff', marginBottom: 16, fontSize: '1rem' }}>Analytics Overview</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
+            {[
+              { label: 'Total Views', value: '1,234', icon: '👁️', color: '#00f0ff' },
+              { label: 'Projects', value: '4', icon: '🚀', color: '#bf00ff' },
+              { label: 'Skills', value: '20', icon: '⚡', color: '#ff0080' },
+              { label: 'Experience', value: '2', icon: '💼', color: '#00ff88' },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                style={{
+                  padding: '20px 18px', background: 'rgba(12,12,34,0.6)',
+                  border: '1px solid rgba(42,42,74,0.3)', borderRadius: 14,
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontSize: 28, marginBottom: 8 }}>{stat.icon}</div>
+                <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.5rem', fontWeight: 700, color: stat.color, marginBottom: 4 }}>
+                  {stat.value}
+                </div>
+                <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.7rem', color: '#666', letterSpacing: 1 }}>
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <div style={{ padding: 20, background: 'rgba(0,240,255,0.03)', borderRadius: 12, border: '1px solid rgba(0,240,255,0.1)' }}>
+            <p style={{ color: '#8888aa', fontFamily: "'Rajdhani', sans-serif", fontSize: '0.9rem' }}>
+              📊 Analytics tracking can be integrated with Google Analytics, Vercel Analytics, or custom tracking solutions.
+            </p>
+          </div>
+        </div>
+      );
       default: return null;
     }
   };
@@ -815,34 +914,112 @@ function AdminDesktop() {
       {/* ─── Desktop Icons ─── */}
       <div style={{
         position: 'absolute', top: 64, left: 16, right: 16,
-        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(132px, 1fr))', gap: 14, zIndex: 2,
-        width: 'min(560px, calc(100vw - 32px))', margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+        gap: 16, zIndex: 2,
+        width: 'min(600px, calc(100vw - 32px))', margin: '0 auto',
       }}>
-        {adminApps.map((app, i) => (
-          <motion.div
-            key={app.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.07, type: 'spring', stiffness: 250 }}
-            onClick={() => openWin(app.id, app.title, app.icon)}
-            whileHover={{ scale: 1.05, borderColor: 'rgba(0,240,255,0.25)', boxShadow: '0 0 20px rgba(0,240,255,0.1)' }}
-            whileTap={{ scale: 0.96 }}
-            style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-              minHeight: 126, padding: '18px 10px', borderRadius: 14,
-              background: 'rgba(12,12,34,0.6)', border: '1px solid rgba(42,42,74,0.25)',
-              backdropFilter: 'blur(8px)', cursor: 'pointer', transition: 'border-color 0.3s, box-shadow 0.3s',
-            }}
-          >
-            <span style={{ fontSize: 34 }}>{app.icon}</span>
-            <span style={{ fontSize: 11, fontFamily: "'Orbitron', sans-serif", fontWeight: 600, color: '#b0b0d0', textAlign: 'center', letterSpacing: 0.5 }}>
-              {app.title}
-            </span>
-            <span style={{ fontSize: 9, fontFamily: "'Share Tech Mono', monospace", color: '#444', textAlign: 'center' }}>
-              {app.desc}
-            </span>
-          </motion.div>
-        ))}
+        {adminApps.map((app, i) => {
+          const glowColors = ['#00f0ff', '#bf00ff', '#ff0080', '#00ff88', '#ffaa00', '#00aaff'];
+          const glow = glowColors[i % glowColors.length];
+          return (
+            <motion.div
+              key={app.id}
+              initial={{ opacity: 0, y: 30, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: i * 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+              onClick={() => openWin(app.id, app.title, app.icon)}
+              whileHover={{
+                scale: 1.08,
+                y: -5,
+                boxShadow: `0 0 30px ${glow}40, 0 10px 40px rgba(0,0,0,0.3)`,
+                borderColor: `${glow}60`
+              }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                minHeight: 140, padding: '22px 14px', borderRadius: 18,
+                background: 'linear-gradient(180deg, rgba(12,12,34,0.8) 0%, rgba(8,8,24,0.9) 100%)',
+                border: '1px solid rgba(42,42,74,0.3)',
+                backdropFilter: 'blur(12px)', cursor: 'pointer',
+                position: 'relative', overflow: 'hidden',
+                transition: 'border-color 0.3s, box-shadow 0.3s',
+              }}
+            >
+              {/* Glow effect on hover */}
+              <motion.div
+                style={{
+                  position: 'absolute', inset: 0,
+                  background: `radial-gradient(circle at 50% 0%, ${glow}15, transparent 70%)`,
+                  opacity: 0,
+                  transition: 'opacity 0.3s',
+                }}
+                whileHover={{ opacity: 1 }}
+              />
+              
+              {/* Icon with glow */}
+              <motion.span
+                style={{
+                  fontSize: 42,
+                  position: 'relative', zIndex: 1,
+                  filter: `drop-shadow(0 0 8px ${glow}60)`,
+                }}
+                animate={{
+                  y: [0, -3, 0],
+                }}
+                transition={{
+                  duration: 2 + (i * 0.3),
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: i * 0.2
+                }}
+              >
+                {app.icon}
+              </motion.span>
+              
+              {/* Title */}
+              <span style={{
+                fontSize: 12,
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 700,
+                color: '#e0e0ff',
+                textAlign: 'center',
+                letterSpacing: 1,
+                position: 'relative', zIndex: 1,
+                textShadow: `0 0 10px ${glow}40`,
+              }}>
+                {app.title}
+              </span>
+              
+              {/* Description */}
+              <span style={{
+                fontSize: 9,
+                fontFamily: "'Share Tech Mono', monospace",
+                color: '#666688',
+                textAlign: 'center',
+                position: 'relative', zIndex: 1,
+                letterSpacing: 0.5,
+              }}>
+                {app.desc}
+              </span>
+              
+              {/* Bottom accent line */}
+              <motion.div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '40%',
+                  height: 2,
+                  background: `linear-gradient(90deg, transparent, ${glow}, transparent)`,
+                  borderRadius: 1,
+                }}
+                whileHover={{ width: '60%' }}
+              />
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* ─── Windows ─── */}
