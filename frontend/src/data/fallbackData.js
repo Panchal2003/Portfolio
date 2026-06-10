@@ -118,3 +118,27 @@ export const fallbackEducation = [
     description: 'B.Tech in Computer Science & Engineering completed with First Division.',
   },
 ];
+
+export const fallbackAchievements = [
+  {
+    _id: '1',
+    title: 'Full Stack MERN Developer',
+    description: 'Successfully delivered multiple production-grade web applications using MongoDB, Express.js, React.js, and Node.js.',
+    date: '2025',
+    icon: '🚀',
+  },
+  {
+    _id: '2',
+    title: 'Project Lead',
+    description: 'Led end-to-end development and deployment of business websites for Biswas Group of Companies.',
+    date: '2025-2026',
+    icon: '👨‍💼',
+  },
+  {
+    _id: '3',
+    title: 'Hardware-Software Integration',
+    description: 'Integrated laser speed gun systems with software solutions for real-time vehicle speed detection.',
+    date: '2025',
+    icon: '🔧',
+  },
+];

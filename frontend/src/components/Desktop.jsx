@@ -33,6 +33,7 @@ import {
   fallbackProjects,
   fallbackExperience,
   fallbackEducation,
+  fallbackAchievements,
 } from '../data/fallbackData';
 import {
   normalizeEducationList,
@@ -475,7 +476,7 @@ export default function Desktop() {
     projects: fallbackProjects,
     experience: fallbackExperience,
     education: fallbackEducation,
-    achievements: [],
+    achievements: fallbackAchievements,
   });
 
   const activeTheme = THEME_PRESETS[uiSettings.theme] || THEME_PRESETS.dark;
@@ -508,7 +509,7 @@ export default function Desktop() {
           projects: projects.status === 'fulfilled' ? projects.value.data : fallbackProjects,
           experience: experience.status === 'fulfilled' ? experience.value.data : fallbackExperience,
           education: normalizeEducationList(education.status === 'fulfilled' ? education.value.data : fallbackEducation),
-          achievements: achievements.status === 'fulfilled' && Array.isArray(achievements.value.data) ? achievements.value.data : [],
+          achievements: achievements.status === 'fulfilled' && Array.isArray(achievements.value.data) ? achievements.value.data : fallbackAchievements,
         });
       } catch {
         // Keep fallback data when API calls fail.

@@ -1,6 +1,7 @@
 export const UI_SETTINGS_STORAGE_KEY = 'portfolio-ui-settings:v1';
 
 export const MOBILE_GRID_PRESETS = {
+  '3x3': { columns: 3, rows: 3, label: '3 x 3' },
   '3x4': { columns: 3, rows: 4, label: '3 x 4' },
   '4x3': { columns: 4, rows: 3, label: '4 x 3' },
   '4x4': { columns: 4, rows: 4, label: '4 x 4' },
