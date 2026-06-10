@@ -5,11 +5,11 @@ export default function StartMenu({ apps, onOpenApp }) {
 
   const menuStyle = {
     position: 'fixed',
-    bottom: isMobile ? '74px' : '52px',
+    bottom: isMobile ? 'calc(74px + env(safe-area-inset-bottom, 0px))' : '52px',
     left: isMobile ? 0 : '8px',
     right: isMobile ? 0 : 'auto',
     width: isMobile ? '100%' : '320px',
-    maxHeight: isMobile ? 'calc(100vh - 28px - 74px)' : 'auto',
+    maxHeight: isMobile ? 'calc(100vh - 28px - 74px - env(safe-area-inset-bottom, 0px))' : 'auto',
     background: 'var(--window-bg)',
     backdropFilter: 'blur(20px)',
     border: '1px solid var(--border)',

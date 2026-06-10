@@ -20,7 +20,7 @@ export default function MobileDock({ items = [] }) {
         WebkitBackdropFilter: 'blur(24px)',
         borderTop: '1px solid rgba(255,255,255,0.08)',
         paddingTop: 10,
-        paddingBottom: 8,
+        paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))',
       }}
     >
       <div

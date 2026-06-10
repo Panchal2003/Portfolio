@@ -422,6 +422,7 @@ function MobileClockWidget({ mode }) {
         top: mode === 'tablet' ? 26 : 22,
         left: 0,
         right: 0,
+        paddingTop: 'env(safe-area-inset-top, 0px)',
         textAlign: 'center',
         pointerEvents: 'none',
         zIndex: 1,

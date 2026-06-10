@@ -75,7 +75,7 @@ export default function MobileHomeGrid({
   const containerRef = useRef(null);
   const [containerSize, setContainerSize] = useState(() => ({
     width: window.innerWidth,
-    height: Math.max(window.innerHeight - 260, 280),
+    height: Math.max(window.innerHeight - 320, 280),
   }));
   const [orderedIds, setOrderedIds] = useState(() => getStoredOrder(storageKey, apps));
   const [dragState, setDragState] = useState(null);
@@ -100,7 +100,7 @@ export default function MobileHomeGrid({
   useEffect(() => {
     const handleResize = () => {
       const width = containerRef.current?.offsetWidth || window.innerWidth;
-      const height = containerRef.current?.offsetHeight || Math.max(window.innerHeight - 260, 280);
+      const height = containerRef.current?.offsetHeight || Math.max(window.innerHeight - 320, 280);
       setContainerSize({ width, height });
     };
 
@@ -197,10 +197,10 @@ export default function MobileHomeGrid({
       ref={containerRef}
       style={{
         position: 'absolute',
-        top: mode === 'mobile' ? 138 : 156,
+        top: mode === 'mobile' ? 'calc(138px + env(safe-area-inset-top, 0px))' : 'calc(156px + env(safe-area-inset-top, 0px))',
         left: 0,
         right: 0,
-        bottom: 98,
+        bottom: 'calc(98px + env(safe-area-inset-bottom, 0px))',
         overflow: 'hidden',
       }}
     >

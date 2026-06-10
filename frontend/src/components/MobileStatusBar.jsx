@@ -46,7 +46,7 @@ export default function MobileStatusBar({ onOpenSystemInfo }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 16px',
+        padding: 'env(safe-area-inset-top, 0px) 16px 0 16px',
         zIndex: 10000,
       }}
     >
